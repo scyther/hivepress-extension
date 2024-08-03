@@ -9,7 +9,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Form class.
  */
-class Vendors_Unfollow extends Form {
+class Add_Family_Member extends Form {
 
 	/**
 	 * Class constructor.
@@ -19,8 +19,8 @@ class Vendors_Unfollow extends Form {
 	public function __construct( $args = [] ) {
 		$args = hp\merge_arrays(
 			[
-				'description' => esc_html__( 'Are you sure you want to unfollow all vendors?', 'foo-followers' ),
-				'action'      => hivepress()->router->get_url( 'vendors_unfollow_action' ),
+				'description' => esc_html__( 'Are you sure you want to add this member?', 'Event-Register' ),
+				'action'      => hivepress()->router->get_url( 'add_family_member_action' ),
 				'method'      => 'POST',
 				'redirect'    => true,
 
