@@ -32,13 +32,13 @@ final class Family_Members extends Controller
 						'action' => [$this, 'render_family_page'],
 						'paginated' => true,
 					],
-					// 'vendor_follow_action' => [
-					// 	'base' => 'vendor_resource',
-					// 	'path' => '/follow',
-					// 	'method' => 'POST',
-					// 	'action' => [$this, 'follow_vendor'],
-					// 	'rest' => true,
-					// ],
+					'add_family_member_action' => [
+						'base' => 'user_account_page',
+						'path' => '/add-family-member',
+						'method' => 'POST',
+						'action' => [$this, 'add_family_member'],
+						'rest' => true,
+					],
 
 					// 'vendors_unfollow_action' => [
 					// 	'base' => 'vendors_resource',
@@ -114,6 +114,62 @@ final class Family_Members extends Controller
 				]
 			)
 		)->render();
+	}
+
+
+
+	/**
+	 * Follows or unfollows vendor.
+	 *
+	 * @param \WP_REST_Request $request API request.
+	 * @return \WP_Rest_Response \WP_Rest_Response
+	 */
+	public function add_family_member($request)
+	{
+
+		// Check authentication.
+		if (!is_user_logged_in()) {
+			return hp\rest_error(401);
+		}
+
+		$userId = get_current_user_id();
+		$name = $request->get_param('name');
+		$age = $request->get_param('age');
+
+
+		// Get Members.
+		$members = Models\Family_Member::query()->filter(
+			[
+				'family_owner' => $userId,
+				'name' => $name,
+				'age' => $age,
+			]
+		)->get();
+
+		if ($members->count()) {
+			return hp\rest_error(400, 'Member already exists');
+		} else {
+
+			// Add new follow.
+			$member = (new Models\Family_Member())->fill(
+				[
+					'name' => $name,
+					'age' => $age,
+					'family_owner' => $userId,
+				]
+			);
+
+			if (!$member->save()) {
+				return hp\rest_error(400, $member->_get_errors());
+			}
+		}
+
+		return hp\rest_response(
+			200,
+			[
+				'data' => [],
+			]
+		);
 	}
 
 
