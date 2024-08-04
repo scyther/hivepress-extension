@@ -23,6 +23,7 @@ final class Family_Members extends Component
 	{
 
 		add_filter('hivepress/v1/components/request/context', [$this, 'set_request_context']);
+		add_filter( 'hivepress/v1/menus/user_account', [ $this, 'add_menu_item' ] );
 		parent::__construct($args);
 	}
 
@@ -41,7 +42,7 @@ final class Family_Members extends Component
 
 		// Get cached vendor IDs.
 		$family_members = hivepress()->cache->get_user_cache($user_id, 'user_family_members', 'models/family_member');
-
+		$member_ids = [];
 		if (is_null($family_members)) {
 
 			// Get follows.
@@ -51,8 +52,7 @@ final class Family_Members extends Component
 				]
 			)->get();
 
-			// Get vendor IDs.
-			$member_ids = [];
+
 
 			foreach ($members as $member) {
 				$member_ids[] = $member->get_id();
@@ -67,4 +67,21 @@ final class Family_Members extends Component
 
 		return $context;
 	}
+
+	/**
+ * Adds menu item to user account.
+ *
+ * @param array $menu Menu arguments.
+ * @return array
+ */
+public function add_menu_item( $menu ) {
+	if ( hivepress()->request->get_context( 'user_family_members' ) ) {
+		$menu['items']['listings_feed'] = [
+			'route'  => 'user_family_page',
+			'_order' => 20,
+		];
+	}
+
+	return $menu;
+}
 }
